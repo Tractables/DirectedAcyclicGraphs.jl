@@ -1,6 +1,6 @@
 using Test
-using LogicCircuits
+using DAGs
 
-# TODO add similar tests for `Trees` as `Graphs`
+# TODO add similar tests for `Tree`s as `DAG`s
 
 @test true
