@@ -100,6 +100,10 @@ module TestNodes
         @test left_most_descendent(r) == l1
         @test right_most_descendent(r) == l2
 
+        np = num_parents(r)
+        @test np[r] == 0
+        @test np[l1] == 2
+        @test np[j1] == 1
     end    
 
 end

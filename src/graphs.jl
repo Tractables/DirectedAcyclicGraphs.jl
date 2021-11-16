@@ -286,7 +286,9 @@ function num_parents(root::DAG)
     count[root] = 0
     foreach(root) do n
         if isinner(n)
-            count[n] = get(count,n,0) + 1
+            for c in children(n)
+                count[c] = get(count, c, 0) + 1
+            end
         end
     end
     count
