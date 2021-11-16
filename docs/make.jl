@@ -14,7 +14,7 @@ pages = [
 
 format = Documenter.HTML(
     prettyurls = !("local" in ARGS),
-    canonical = "https://github.com/Juice-jl/DAGs.jl/stable/",
+    canonical = "https://juice-jl.github.io/DAGs.jl/stable/",
     assets = ["assets/favicon.ico"],
     analytics = "UA-136089579-2",
     highlights = ["yaml"],
