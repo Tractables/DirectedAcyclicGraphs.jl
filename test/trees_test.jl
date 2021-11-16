@@ -1,5 +1,5 @@
 using Test
-using DAGs
+using DirectedAcyclicGraphs
 
 # TODO add similar tests for `Tree`s as `DAG`s
 

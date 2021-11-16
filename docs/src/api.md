@@ -1,6 +1,6 @@
 
-# [DAGs](@id api-internal-dags)
+# [DirectedAcyclicGraphs](@id api-internal-dags)
 
 ```@autodocs
-Modules = [DAGs]
+Modules = [DirectedAcyclicGraphs]
 ```

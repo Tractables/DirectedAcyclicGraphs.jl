@@ -1,10 +1,10 @@
 using Test
-using DAGs
+using DirectedAcyclicGraphs
 
 module TestNodes
 
     using Test
-    using ..DAGs
+    using ..DirectedAcyclicGraphs
 
     mutable struct TestINode <: DAG
         id::Int
@@ -17,9 +17,9 @@ module TestNodes
         TestLNode(i) = new(i)
     end
 
-    DAGs.NodeType(::Type{<:TestINode}) = Inner()
-    DAGs.NodeType(::Type{<:TestLNode}) = Leaf()
-    DAGs.children(n::TestINode) = n.children
+    DirectedAcyclicGraphs.NodeType(::Type{<:TestINode}) = Inner()
+    DirectedAcyclicGraphs.NodeType(::Type{<:TestLNode}) = Leaf()
+    DirectedAcyclicGraphs.children(n::TestINode) = n.children
 
     @testset "Graphs utils for TestNodes" begin
 

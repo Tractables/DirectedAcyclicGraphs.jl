@@ -1,6 +1,6 @@
 using Documenter
 using DocumenterLaTeX
-using DAGs
+using DirectedAcyclicGraphs
 using Literate
 
 
@@ -14,7 +14,7 @@ pages = [
 
 format = Documenter.HTML(
     prettyurls = !("local" in ARGS),
-    canonical = "https://juice-jl.github.io/DAGs.jl/stable/",
+    canonical = "https://juice-jl.github.io/DirectedAcyclicGraphs.jl/stable/",
     assets = ["assets/favicon.ico"],
     analytics = "UA-136089579-2",
     highlights = ["yaml"],
@@ -22,11 +22,11 @@ format = Documenter.HTML(
 )
 
 makedocs(
-    sitename = "DAGs.jl",
+    sitename = "DirectedAcyclicGraphs.jl",
     pages    = pages,
     format   = format,
     doctest  = true,
-    modules  = [DAGs],
+    modules  = [DirectedAcyclicGraphs],
     linkcheck_ignore = [
         # We'll ignore links that point to GitHub's edit pages, as they redirect to the
         # login screen and cause a warning:
@@ -39,7 +39,7 @@ makedocs(
 # for more information.
 deploydocs(
     target = "build",
-    repo = "github.com/Juice-jl/DAGs.jl.git",
+    repo = "github.com/Juice-jl/DirectedAcyclicGraphs.jl.git",
     branch = "gh-pages",
     devbranch = "main",
     devurl = "dev",
