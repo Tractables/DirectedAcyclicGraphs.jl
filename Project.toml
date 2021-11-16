@@ -2,3 +2,6 @@ name = "DAGs"
 uuid = "1e6dae5e-d6e2-422d-9af3-452e7a3785ee"
 authors = ["Guy Van den Broeck <guyvdb@cs.ucla.edu>"]
 version = "0.1.0"
+
+[compat]
+julia = "1.6"
