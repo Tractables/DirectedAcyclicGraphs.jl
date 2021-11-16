@@ -6,20 +6,20 @@ module TestNodes
     using Test
     using ..DAGs
 
-    mutable struct TestINode <: Dag
+    mutable struct TestINode <: DAG
         id::Int
-        children::Vector{Dag}
+        children::Vector{DAG}
         TestINode(i,c) = new(i,c)
     end
 
-    mutable struct TestLNode <: Dag
+    mutable struct TestLNode <: DAG
         id::Int
         TestLNode(i) = new(i)
     end
 
-    LogicCircuits.NodeType(::Type{<:TestINode}) = Inner()
-    LogicCircuits.NodeType(::Type{<:TestLNode}) = Leaf()
-    LogicCircuits.children(n::TestINode) = n.children
+    DAGs.NodeType(::Type{<:TestINode}) = Inner()
+    DAGs.NodeType(::Type{<:TestLNode}) = Leaf()
+    DAGs.children(n::TestINode) = n.children
 
     @testset "Graphs utils for TestNodes" begin
 
@@ -79,10 +79,10 @@ module TestNodes
         @test num_nodes(r) == 9
         @test num_edges(r) == 12
 
-        @test isempty(inodes(l1))
+        @test isempty(innernodes(l1))
         @test leafnodes(l1) == [l1]
 
-        @test issetequal(inodes(r), [i1,i2,i12,j1,j2,j12,r])
+        @test issetequal(innernodes(r), [i1,i2,i12,j1,j2,j12,r])
         @test issetequal(innernodes(r), [i1,i2,i12,j1,j2,j12,r])
         @test issetequal(leafnodes(r), [l1,l2])
         
@@ -93,7 +93,7 @@ module TestNodes
         @test linearize(l2) == [l2]
         @test length(linearize(i12)) == 3
 
-        @test eltype(linearize(r)) == Dag
+        @test eltype(linearize(r)) == DAG
         @test eltype(linearize(l1)) == TestLNode
         @test eltype(linearize(r, Any)) == Any
 

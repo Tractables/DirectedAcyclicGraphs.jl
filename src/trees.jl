@@ -7,7 +7,7 @@ export parent, has_parent, root, isroot,
 #####################
 
 "A node in a tree (of which it is the root)"
-abstract type Tree <: Dag end
+abstract type Tree <: DAG end
 
 #####################
 # methods
