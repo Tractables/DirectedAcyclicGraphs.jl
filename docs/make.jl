@@ -41,7 +41,7 @@ deploydocs(
     target = "build",
     repo = "github.com/Juice-jl/DAGs.jl.git",
     branch = "gh-pages",
-    devbranch = "master",
+    devbranch = "main",
     devurl = "dev",
     versions = ["stable" => "v^", "v#.#"],
 )
