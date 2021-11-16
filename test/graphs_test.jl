@@ -17,9 +17,9 @@ module TestNodes
         TestLNode(i) = new(i)
     end
 
-    NodeType(::Type{<:TestINode}) = Inner()
-    NodeType(::Type{<:TestLNode}) = Leaf()
-    children(n::TestINode) = n.children
+    DAGs.NodeType(::Type{<:TestINode}) = Inner()
+    DAGs.NodeType(::Type{<:TestLNode}) = Leaf()
+    DAGs.children(n::TestINode) = n.children
 
     @testset "Graphs utils for TestNodes" begin
 
