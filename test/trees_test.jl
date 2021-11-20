@@ -114,6 +114,13 @@ module TestNodes
         @test np[r] == 0
         @test np[l1] == 1
         @test np[i34] == 1
+
+        f_l(n) = 1
+        f_i1(n,cs) = sum(cs) + 1
+        f_i2(n,call) = mapreduce(call, +, children(n)) + 1
+
+        @test foldup(r, f_l, f_i2, Int) == foldup_aggregate(r, f_l, f_i1, Int)
+
     end    
 
 end
