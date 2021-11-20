@@ -46,7 +46,7 @@ A given `descends_from` function is required to quickly check whether a node is 
 function lca(v::Tree, w::Tree, descends_from::Function)::Tree
     v === w && return v
     descends_from(w,v) && return v
-    candidate::Union{Dag,Nothing} = w
+    candidate::Union{DAG,Nothing} = w
     while issomething(candidate)
         descends_from(v, candidate) && return candidate
         candidate = parent(candidate)
