@@ -4,8 +4,8 @@ export DAG, NodeType, Leaf, Inner,
        num_nodes, num_edges, tree_num_nodes, tree_num_edges, in,
        inodes, innernodes, leafnodes, num_innernodes, num_leafnodes, linearize,
        left_most_descendent, right_most_descendent,
-       label_nodes, num_parents,
-       node_stats, inode_stats, leaf_stats,
+       num_parents, label_nodes,
+       node_stats, innernode_stats, leaf_stats,
        parent_stats
 
 
@@ -267,8 +267,8 @@ end
 """
 Assign an integer label to each circuit node, bottom up, starting at `1`
 """
-function parent_count(root::DAG)
-    labeling = Dict{Node,Int}()
+function label_nodes(root::DAG)
+    labeling = Dict{DAG,Int}()
     i = 0
     foreach(root) do node
         labeling[node] = (i+=1)
@@ -308,15 +308,15 @@ Base.show(io::IO, c::DAG) = print(io, "$(typeof(c))($(hash(c)))")
 
 Give count of types and fan-ins of all nodes in the graph
 """
-node_stats(c::DAG) = merge(leaf_stats(c), inode_stats(c))
+node_stats(c::DAG) = merge(leaf_stats(c), innernode_stats(c))
 
 """
-    inode_stats(c::DAG)
+    innernode_stats(c::DAG)
 
 Give count of types and fan-ins of inner nodes in the graph
 """
-function inode_stats(c::DAG)
-    groups = groupby(e -> (typeof(e), num_children(e)), inodes(c))
+function innernode_stats(c::DAG)
+    groups = groupby(e -> (typeof(e), num_children(e)), innernodes(c))
     map_values(v -> length(v), groups, Int)
 end
 

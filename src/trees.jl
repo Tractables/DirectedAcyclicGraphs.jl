@@ -19,7 +19,7 @@ import Base: parent
 @inline parent(n::Tree) = n.parent
 
 "Does the node have a parent?"
-@inline has_parent(n::Tree)::Bool = issomething(parent(n))
+@inline has_parent(n::Tree)::Bool = !isnothing(parent(n))
 
 "Get the root of the given tree node"
 root(n::Tree) =
@@ -47,7 +47,7 @@ function lca(v::Tree, w::Tree, descends_from::Function)::Tree
     v === w && return v
     descends_from(w,v) && return v
     candidate::Union{DAG,Nothing} = w
-    while issomething(candidate)
+    while !isnothing(candidate)
         descends_from(v, candidate) && return candidate
         candidate = parent(candidate)
     end
@@ -87,7 +87,7 @@ Supports `nothing` as a catch-all for either left or right. Returns nothing if n
 function find_inode(left, right, descends_from::Function)
     isnothing(left) && isnothing(right) && return nothing
     candidate = lca(left, right, descends_from)
-    while issomething(candidate)
+    while !isnothing(candidate)
         if isinner(candidate) && num_children(candidate) == 2 && 
             (isnothing(left) || 
                 descends_from(left, children(candidate)[1])) && 
