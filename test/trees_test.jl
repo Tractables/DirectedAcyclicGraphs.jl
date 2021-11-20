@@ -9,12 +9,20 @@ module TestNodes
     mutable struct TestINode <: Tree
         id::Int
         children::Vector{Tree}
-        TestINode(i,c) = new(i,c)
+        parent
+        TestINode(i,c) = begin
+            x = new(i,c, nothing)
+            for n in c
+                n.parent = x
+            end
+            x
+        end
     end
 
     mutable struct TestLNode <: Tree
         id::Int
-        TestLNode(i) = new(i)
+        parent
+        TestLNode(i) = new(i, nothing)
     end
 
     DirectedAcyclicGraphs.NodeType(::Type{<:TestINode}) = Inner()
@@ -31,14 +39,10 @@ module TestNodes
         @test isleaf(l1)
         @test !isinner(l1)
 
-        i1 = TestINode(1,[l1])
-        i2 = TestINode(2,[l2])
         i12 = TestINode(3,[l1,l2])
 
-        @test has_children(i1)
         @test has_children(i12)
 
-        @test num_children(i1) == 1
         @test num_children(i12) == 2
 
         l3 = TestLNode(4)
@@ -51,6 +55,12 @@ module TestNodes
         @test has_children(r)
         @test num_children(r) == 2
         
+        @test has_parent(l1)
+        @test has_parent(i12)
+        @test !has_parent(r)
+        @test parent(l1) === i12
+        @test parent(i12) === r
+
         foreach(r) do n
             n.id += 1
         end
@@ -61,8 +71,6 @@ module TestNodes
         @test l4.id == 6
         @test i34.id == 7
         @test r.id == 8
-        @test i1.id == 1
-        @test i2.id == 2
 
         foreach(r, l -> l.id += 1, i -> i.id -= 1)
         
@@ -73,8 +81,6 @@ module TestNodes
         @test l4.id == 6 + 1
         @test i34.id == 7 - 1
         @test r.id == 8 - 1
-        @test i1.id == 1 - 0
-        @test i2.id == 2 - 0
 
         @test filter(n -> iseven(n.id), r) == [l2,l3,i34]
 
@@ -120,6 +126,22 @@ module TestNodes
         f_i2(n,call) = mapreduce(call, +, children(n)) + 1
 
         @test foldup(r, f_l, f_i2, Int) == foldup_aggregate(r, f_l, f_i1, Int)
+
+        function df(n,m)
+            v = if m === i12
+                n === l1 || n === l2
+            elseif m === i34
+                n === l3 || n === l4
+            elseif m === r
+                true
+            else    
+                @assert isleaf(m)
+                false 
+            end
+            v || (n === m)
+        end
+
+        @test lca(l1,l2,df) == i12
 
     end    
 
