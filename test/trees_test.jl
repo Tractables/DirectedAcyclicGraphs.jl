@@ -6,7 +6,8 @@ module TestNodes
     using Test
     using ..DirectedAcyclicGraphs
 
-    mutable struct TestINode <: Tree
+    abstract type TestNode <: Tree end
+    mutable struct TestINode <: TestNode
         id::Int
         children::Vector{Tree}
         parent
@@ -19,7 +20,7 @@ module TestNodes
         end
     end
 
-    mutable struct TestLNode <: Tree
+    mutable struct TestLNode <: TestNode
         id::Int
         parent
         TestLNode(i) = new(i, nothing)
@@ -60,6 +61,10 @@ module TestNodes
         @test !has_parent(r)
         @test parent(l1) === i12
         @test parent(i12) === r
+
+        @test isroot(r)
+        @test !isroot(i12)
+        @test root(l4) === r
 
         foreach(r) do n
             n.id += 1
@@ -109,7 +114,7 @@ module TestNodes
         @test linearize(l2) == [l2]
         @test length(linearize(i12)) == 3
 
-        @test eltype(linearize(r)) == Tree
+        @test eltype(linearize(r)) == TestNode
         @test eltype(linearize(l1)) == TestLNode
         @test eltype(linearize(r, Any)) == Any
 
@@ -141,8 +146,29 @@ module TestNodes
             v || (n === m)
         end
 
-        @test lca(l1,l2,df) == i12
+        DirectedAcyclicGraphs.lca(x::TestNode, y::TestNode) =
+            lca(x,y,df)
 
+        @test lca(l1,l2) == i12
+        @test lca(l1,l2,i34) == r
+        @test lca(l1) == l1
+        @test_throws ErrorException lca(l3, TestLNode(2)) 
+        @test lca(nothing, l1, df) == l1
+        @test lca(l1, nothing, df) == l1
+
+        @test find_inode(l1,l2,df) == i12
+        @test find_inode(l3,l4,df) == i34
+        @test find_inode(l1,l4,df) == r
+
+        @test find_leaf(r, x -> true) == l1
+        @test_throws ErrorException find_leaf(r, x -> false)
+
+        @test depth(r, x -> true) == 2
+        @test_throws ErrorException depth(r, x -> false)
+
+        b = IOBuffer()
+        print_tree(r,b)
+        @test !isempty(String(take!(b)))
     end    
 
 end
