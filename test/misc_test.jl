@@ -1,5 +1,5 @@
 using Test
-using DirectedAcyclicGraphs
+using DirectedAcyclicGraphs: map_values, groupby
 
 @testset "Helper Functions" begin
 
