@@ -1,7 +1,7 @@
 using Test
 using DirectedAcyclicGraphs
 
-module TestNodes
+module TestDAGs
 
     using Test
     using ..DirectedAcyclicGraphs
@@ -21,7 +21,7 @@ module TestNodes
     DirectedAcyclicGraphs.NodeType(::Type{<:TestLNode}) = Leaf()
     DirectedAcyclicGraphs.children(n::TestINode) = n.children
 
-    @testset "Graphs utils for TestNodes" begin
+    @testset "DAG utils for TestNodes" begin
 
         l1 = TestLNode(1)
         l2 = TestLNode(2)

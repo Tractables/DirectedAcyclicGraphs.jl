@@ -137,7 +137,7 @@ function foreach_down(f::Function, node::Tree)
     f(node)
     if isinner(node)
         for c in children(node)
-            foreach(f, c)
+            foreach_down(f, c)
         end
     end
     nothing
