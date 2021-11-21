@@ -162,6 +162,7 @@ module TestNodes
         @test find_inode(l1,l4,df) == r
         @test find_inode(l2,nothing,df) == r
         @test find_inode(nothing,l3,df) == r
+        @test find_inode(l2,l1,df) === nothing
 
         @test find_leaf(r, x -> true) == l1
         @test_throws ErrorException find_leaf(r, x -> false)
