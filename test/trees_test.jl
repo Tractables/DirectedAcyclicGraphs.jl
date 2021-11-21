@@ -155,10 +155,13 @@ module TestNodes
         @test_throws ErrorException lca(l3, TestLNode(2)) 
         @test lca(nothing, l1, df) == l1
         @test lca(l1, nothing, df) == l1
+        @test lca(nothing, nothing, df) === nothing
 
         @test find_inode(l1,l2,df) == i12
         @test find_inode(l3,l4,df) == i34
         @test find_inode(l1,l4,df) == r
+        @test find_inode(l2,nothing,df) == r
+        @test find_inode(nothing,l3,df) == r
 
         @test find_leaf(r, x -> true) == l1
         @test_throws ErrorException find_leaf(r, x -> false)
@@ -169,6 +172,20 @@ module TestNodes
         b = IOBuffer()
         print_tree(r,b)
         @test !isempty(String(take!(b)))
+
+        DirectedAcyclicGraphs.isequal_local(x::TestNode,y::TestNode) = 
+            x.id == y.id
+
+        k1 = TestLNode(3)
+        k2 = TestLNode(4)
+        j12 = TestINode(3,[k1,k2])
+
+        @test k1 != l2
+        @test k1 == l1
+        @test j12 != i34
+        @test j12 == i12
+
+
     end    
 
 end

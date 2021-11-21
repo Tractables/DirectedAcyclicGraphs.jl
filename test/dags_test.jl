@@ -110,6 +110,22 @@ module TestDAGs
         f_i2(n,call) = mapreduce(call, +, children(n)) + 1
 
         @test foldup(r, f_l, f_i2, Int) == foldup_aggregate(r, f_l, f_i1, Int)
+
+        @test tree_num_nodes(r) == 15
+        @test tree_num_edges(r) == 14
+        @test num_leafnodes(r) == 2
+        @test num_innernodes(r) == 7
+
+        @test j1 ∈ r
+        @test TestLNode(24) ∉ r
+
+        @test left_most_descendent(r) == l1
+        @test right_most_descendent(r) == l2
+
+        @test label_nodes(r)[r] == 9
+
+        @test !isempty(node_stats(r))
+        @test !isempty(parent_stats(r))
     end    
 
 end
