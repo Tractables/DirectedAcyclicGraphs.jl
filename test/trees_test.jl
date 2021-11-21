@@ -174,12 +174,15 @@ module TestNodes
         print_tree(r,b)
         @test !isempty(String(take!(b)))
 
-        DirectedAcyclicGraphs.isequal_local(x::TestNode,y::TestNode) = 
-            x.id == y.id
-
         k1 = TestLNode(3)
         k2 = TestLNode(4)
         j12 = TestINode(3,[k1,k2])
+        
+        @test k1 != l1
+        @test j12 != i12
+
+        DirectedAcyclicGraphs.isequal_local(x::TestNode,y::TestNode) = 
+            x.id == y.id
 
         @test k1 != l2
         @test k1 == l1
