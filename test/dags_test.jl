@@ -126,6 +126,14 @@ module TestDAGs
 
         @test !isempty(node_stats(r))
         @test !isempty(parent_stats(r))
+
+        layers, num_layers = @test_nowarn feedforward_layers(r)
+        @test num_layers == 4
+        @test layers[r] == 4
+        @test layers[l2] == 1
+        @test layers[i12] == 2
+        @test layers[j1] == 3
+
     end    
 
 end
