@@ -270,9 +270,12 @@ Assign an integer label to each circuit node, bottom up, starting at `1`
 function label_nodes(root::DAG)
     labeling = Dict{DAG,Int}()
     i = 0
-    foreach(root) do node
-        labeling[node] = (i+=1)
-    end
+    f_inner(n, call) = begin 
+        foreach(call, children(n))
+        (i += 1)
+    end 
+    f_leaf(n) = (i += 1)
+    foldup(root, f_leaf, f_inner, Int, labeling)
     labeling
 end
 
