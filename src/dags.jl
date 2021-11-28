@@ -4,7 +4,7 @@ export DAG, NodeType, Leaf, Inner,
        num_nodes, num_edges, tree_num_nodes, tree_num_edges, in,
        innernodes, leafnodes, num_innernodes, num_leafnodes, linearize,
        left_most_descendent, right_most_descendent,
-       num_parents, label_nodes,
+       num_parents, label_nodes, feedforward_layers,
        node_stats, innernode_stats, leaf_stats,
        parent_stats
 
@@ -292,6 +292,20 @@ function num_parents(root::DAG)
         end
     end
     count
+end
+
+"""
+    feedforward_layers(root::DAG)
+
+Assign a layer id with each node, starting from leafs to root
+"""
+function feedforward_layers(root::DAG)
+    node2layer = Dict{DAG, Int}()
+    f_inner(n, call) = 
+        1 + mapreduce(call, max, children(n)) 
+    f_leaf(n) = 1
+    num_layers = foldup(root, f_leaf, f_inner, Int, node2layer)
+    node2layer, num_layers
 end
 
 #####################
