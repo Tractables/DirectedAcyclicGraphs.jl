@@ -167,6 +167,25 @@ end
 # methods using circuit traversal
 #####################
 
+import Base.iterate #extend
+
+function iterate(node::DAG, state=nothing)
+    if isnothing(state)
+        lin = linearize(node)
+        liniter = iterate(lin) 
+    else
+        lin = first(state)
+        liniter = iterate(lin, last(state))
+    end
+    if isnothing(liniter)
+        nothing
+    else
+        el, outstate = liniter
+        el, (lin, outstate)
+    end
+end
+    
+
 """
     num_nodes(node::DAG)
 
