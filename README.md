@@ -10,6 +10,7 @@ Functionality includes:
  * computing the number of nodes, number of edges
  * propagating a value through the DAG, that is, a `foldup` operation
  * `filter` the nodes in the DAG
+ * iterate over the nodes in the DAG, compute maximum, minimum, and other Base functions.
  * find the `lca` (lowest common ancestor) of nodes in a tree
  * arrange the DAG nodes in feedforward layers
  * collecting various statistics about the types of nodes and their in/out-degree
