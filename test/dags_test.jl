@@ -134,6 +134,9 @@ module TestDAGs
         @test layers[i12] == 2
         @test layers[j1] == 3
 
+        @test maximum(num_children, r) == 3
+        @test minimum(num_children, r) == 0
+
     end    
 
 end
