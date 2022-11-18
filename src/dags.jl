@@ -1,6 +1,6 @@
 export DAG, NodeType, Leaf, Inner,
-       children, has_children, num_children, isleaf, isinner,
-       foreach, foreach_down, filter, foldup, foldup_aggregate, 
+       children, has_children, num_children, isleaf, isinner, dag_function,
+       foreach, foreach_node, foreach_down, filter, filter_nodes, foldup, foldup_aggregate, 
        num_nodes, num_edges, tree_num_nodes, tree_num_edges, in,
        innernodes, leafnodes, num_innernodes, num_leafnodes, linearize,
        left_most_descendent, right_most_descendent,
@@ -13,10 +13,15 @@ export DAG, NodeType, Leaf, Inner,
 # types and traits
 #####################
 
-"A directed acyclic graph as defined by its root node. This container exists to dispatch on."
+"A directed acyclic graph as defined by its root nodes."
 struct DAG 
-    root
+    roots::Vector
+    "Construct a DAG from a vector of root nodes"
+    DAG(x::Vector) = new(x)    
 end
+
+"Construct a DAG from a single root node"
+DAG(x) = DAG([x])
 
 """
 A trait hierarchy denoting types of `DAG` nodes
@@ -38,7 +43,7 @@ struct Inner <: NodeType end
 # Each `DAG` is required to provide a specialized method for the following functions.
 
 "Get the node type trait of the given `Node`"
-@inline NodeType(node) = NodeType(typeof(node))
+NodeType(node) = NodeType(typeof(node))
 
 "Get the children of a given inner node"
 function children end
@@ -49,20 +54,24 @@ function children end
 #####################
 
 "Does the DAG node have children?"
-@inline has_children(n)::Bool = has_children(NodeType(n), n)
-@inline has_children(::Inner, n)::Bool = true
-@inline has_children(::Leaf, n)::Bool = false
+has_children(n)::Bool = has_children(NodeType(n), n)
+has_children(::Inner, n)::Bool = true
+has_children(::Leaf, n)::Bool = false
 
 "Get the number of children of a given inner DAG node"
-@inline num_children(n)::Int = num_children(NodeType(n), n)
-@inline num_children(::Inner, n)::Int = length(children(n))
-@inline num_children(::Leaf, n)::Int = 0
+num_children(n)::Int = num_children(NodeType(n), n)
+num_children(::Inner, n)::Int = length(children(n))
+num_children(::Leaf, n)::Int = 0
 
 "Is the DAG node a leaf node?"
-@inline isleaf(n) = NodeType(n) isa Leaf
+isleaf(n) = NodeType(n) isa Leaf
 
 "Is the DAG node an inner node?"
-@inline isinner(n) = NodeType(n) isa Inner
+isinner(n) = NodeType(n) isa Inner
+
+"Create a function that does different things on leaf nodes and inner nodes"
+dag_function(f_leaf::Function, f_inner::Function) =
+    n -> isinner(n) ? f_inner(n) : f_leaf(n)
 
 #####################
 # traversal
@@ -70,18 +79,22 @@ function children end
 
 import Base.foreach #extend
 
-foreach(f::Function, dag::DAG, ::Nothing=nothing) =
-    foreach_node(f, dag.root)
+foreach(f::Function, dag::DAG, seen = Dict{Any,Nothing}()) =
+    foreach_node(f, dag, seen)
 
-"Apply a function to each node in a graph, bottom up"
-foreach_node(f::Function, node::DAG, ::Nothing=nothing) =
-    foreach_node(f, node, Dict{DAG,Nothing}())
+"Apply a function to each node in a DAG, bottom up"
+function foreach_node(f::Function, dag::DAG, seen = Dict{Any,Nothing}())
+    for root in dag.roots
+        foreach_node(f, root, seen)
+    end
+end
 
-function foreach_node(f::Function, node, seen)
+"Apply a function to each node in a DAG root node, bottom up"
+function foreach_node(f::Function, node, seen = Dict{Any,Nothing}())
     get!(seen, node) do
         if isinner(node)
             for c in children(node)
-                foreach(f, c, seen)
+                foreach_node(f, c, seen)
             end
         end
         f(node)
@@ -90,29 +103,24 @@ function foreach_node(f::Function, node, seen)
     nothing
 end
 
-function foreach_node(node, f_leaf::Function, f_inner::Function, seen=nothing)
-    foreach_node(node, seen) do n
-        isinner(n) ? f_inner(n) : f_leaf(n)
-    end
-    nothing
-end
-
-"Apply a function to each node in a graph, top down"
-function foreach_down(f::Function, node::DAG)
+"Apply a function to each node in a DAG, top down"
+function foreach_down(f::Function, dag)
     # naive implementation
-    lin = linearize(node)
+    lin = linearize(dag)
     foreach(f, Iterators.reverse(lin))
 end
 
 import Base.filter #extend
 
-filter(p::Function, dag::DAG, seen=nothing, ::Type{T} = Union{}) where T =
-    filter_nodes(p, dag.root, seen, T)
+"""Retrieve list of nodes in DAG matching predicate `p`"""
+filter(p::Function, dag::DAG, seen = Dict{Any,Nothing}(), ::Type{T} = Union{}) where T =
+    filter_nodes(p, dag, seen, T)
 
 """Retrieve list of nodes in DAG matching predicate `p`"""
-function filter_nodes(p::Function, root, seen=nothing, ::Type{T} = Union{})::Vector where T
+function filter_nodes(p::Function, dag, 
+                      seen = Dict{Any,Nothing}(), ::Type{T} = Union{})::Vector where T
     results = Vector{T}()
-    foreach_node(root, seen) do n
+    foreach_node(dag, seen) do n
         if p(n)
             if !(n isa eltype(results))
                 results = collect(typejoin(eltype(results), typeof(n)), results)
@@ -137,6 +145,10 @@ function foldup(node, f_leaf::Function, f_inner::Function, ::Type{T}, ::Nothing=
     foldup(node, f_leaf, f_inner, T, Dict{DAG,T}())
 end
 
+function foldup(dag::DAG, f_leaf::Function, f_inner::Function, ::Type{T}, cache) where {T} 
+    foldup(dag.root, l_leaf, f_inner, T, cache)
+end
+
 function foldup(node, f_leaf::Function, f_inner::Function, ::Type{T}, cache) where {T}
     get!(cache, node) do 
         if isinner(node)
@@ -158,7 +170,11 @@ function foldup_aggregate(node::DAG, f_leaf::Function, f_inner::Function, ::Type
     foldup_aggregate(node, f_leaf, f_inner, T, Dict{DAG,T}())
 end
 
-function foldup_aggregate(node::DAG, f_leaf::Function, f_inner::Function, ::Type{T}, cache) where {T}
+function foldup_aggregate(dag::DAG, f_leaf::Function, f_inner::Function, ::Type{T}, cache) where {T}
+    foldup_aggregate(dag.root, f_leaf, f_inner, T, cache)
+end
+
+function foldup_aggregate(node, f_leaf::Function, f_inner::Function, ::Type{T}, cache) where {T}
     get!(cache, node) do 
         if isinner(node)
             child_values = Vector{T}(undef, num_children(node))
@@ -225,8 +241,8 @@ end
 Compute the number of nodes in of a tree-unfolding of the `DAG`. 
 """
 function tree_num_nodes(node, cache=nothing)
-    @inline f_leaf(n) = one(BigInt)
-    @inline f_inner(n, call) = (1 + mapreduce(call, +, children(n)))
+    f_leaf(n) = one(BigInt)
+    f_inner(n, call) = (1 + mapreduce(call, +, children(n)))
     foldup(node, f_leaf, f_inner, BigInt, cache)
 end
 
@@ -236,8 +252,8 @@ end
 Compute the number of edges in the tree-unfolding of the `DAG`. 
 """
 function tree_num_edges(node::DAG, cache=nothing)::BigInt
-    @inline f_leaf(n) = zero(BigInt)
-    @inline f_inner(n, call) = (num_children(n) + mapreduce(c -> call(c), +, children(n)))
+    f_leaf(n) = zero(BigInt)
+    f_inner(n, call) = (num_children(n) + mapreduce(c -> call(c), +, children(n)))
     foldup(node, f_leaf, f_inner, BigInt, cache)
 end
 
@@ -267,7 +283,7 @@ num_innernodes(c::DAG) =
     length(innernodes(c))
 
 "Order the `DAG`'s nodes bottom-up in a list (with optional element type)"
-@inline linearize(r::DAG, ::Type{T} = Union{}) where T = 
+linearize(r::DAG, ::Type{T} = Union{}) where T = 
     filter(x -> true, r, nothing, typejoin(T, typeof(r)))
 
 """
