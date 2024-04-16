@@ -17,7 +17,7 @@ julia -e 'using Pkg; Pkg.add("DirectedAcyclicGraphs")'
 To install the package with the latest commits on master branch, run:
 
 ```bash
-julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/Juice-jl/DirectedAcyclicGraphs.jl.git"))'
+julia -e 'using Pkg; Pkg.add(PackageSpec(url="https://github.com/Tractables/DirectedAcyclicGraphs.jl.git"))'
 ```
 
 #### From Julia Pkg REPL

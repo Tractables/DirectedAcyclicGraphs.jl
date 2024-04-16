@@ -14,7 +14,7 @@ pages = [
 
 format = Documenter.HTML(
     prettyurls = !("local" in ARGS),
-    canonical = "https://juice-jl.github.io/DirectedAcyclicGraphs.jl/stable/",
+    canonical = "https://tractables.github.io/DirectedAcyclicGraphs.jl/stable/",
     assets = ["assets/favicon.ico"],
     analytics = "UA-136089579-2",
     highlights = ["yaml"],
@@ -39,7 +39,7 @@ makedocs(
 # for more information.
 deploydocs(
     target = "build",
-    repo = "github.com/Juice-jl/DirectedAcyclicGraphs.jl.git",
+    repo = "github.com/Tractables/DirectedAcyclicGraphs.jl.git",
     branch = "gh-pages",
     devbranch = "main",
     devurl = "dev",
