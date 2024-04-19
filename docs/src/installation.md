@@ -31,10 +31,10 @@ While in Pkg mode, run the following to install the latest release:
 ] add DirectedAcyclicGraphs
 ```
 
-Similarly, to install from the latest commits on master branch, run:
+Similarly, to install from the latest commits on main branch, run:
 
 ```julia
-] add DirectedAcyclicGraphs#master
+] add DirectedAcyclicGraphs#main
 ```
 
 ### Testing
